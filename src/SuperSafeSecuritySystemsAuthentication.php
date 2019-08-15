@@ -5,6 +5,7 @@ namespace SuperSafeSecuritySystemsAuthentication;
 use SuperSafeSecuritySystemsAuthentication\Exceptions\AuthenticationException;
 use SuperSafeSecuritySystemsAuthentication\Exceptions\MaxAttemptsException;
 use SuperSafeSecuritySystemsAuthentication\Exceptions\UserCreationException;
+use SuperSafeSecuritySystemsAuthentication\Exceptions\UserDuplicateException;
 
 /**
  * Class Authentication
@@ -80,7 +81,7 @@ class SuperSafeSecuritySystemsAuthentication
         sodium_memzero($password);
 
         if (self::DUPLICATE_USER_MYSQL_ERROR == $this->db->errno) {
-            throw new \Exception('User already exists');
+            throw new UserDuplicateException();
         }
 
         $userId = $this->db->insert_id;
@@ -129,6 +130,10 @@ class SuperSafeSecuritySystemsAuthentication
         }
 
         $user = $results->fetch_assoc();
+
+        if (!$user) {
+            throw new AuthenticationException();
+        }
 
         $passwordData = base64_decode($user['user_password']);
         $secret = base64_decode($user['user_secret']);
