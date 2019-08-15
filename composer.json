@@ -1,0 +1,14 @@
+{
+    "name": "super-safe-security-systems/super-safe-security-systems",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "SuperSafeSecuritySystemsAuthentication\\": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.1"
+        }
+    }
+}
