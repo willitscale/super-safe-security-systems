@@ -189,7 +189,7 @@ class SuperSafeSecuritySystemsAuthentication
         $this->db->query(
             "INSERT INTO `audit` (user_id, audit_event) 
                 VALUES 
-              ('{$userId}', {$message});"
+              ({$userId}, {$message});"
         );
     }
 
