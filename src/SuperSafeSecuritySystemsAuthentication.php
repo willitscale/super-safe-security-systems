@@ -38,7 +38,7 @@ class SuperSafeSecuritySystemsAuthentication
      * @param string $display
      * @param string $password
      * @param int $level
-     * @return string
+     * @return array
      * @throws \Exception
      */
     public function create($email, $display, $password, $level = self::DEFAULT_LEVEL)
@@ -50,7 +50,6 @@ class SuperSafeSecuritySystemsAuthentication
         $this->rateLimitCheck();
 
         $email = sha1($email);
-        sodium_memzero($email);
 
         $display = $this->db->real_escape_string($display);
 
@@ -79,6 +78,7 @@ class SuperSafeSecuritySystemsAuthentication
 
         sodium_memzero($nonce);
         sodium_memzero($password);
+        sodium_memzero($secret);
 
         if (self::DUPLICATE_USER_MYSQL_ERROR == $this->db->errno) {
             throw new UserDuplicateException();
@@ -88,11 +88,13 @@ class SuperSafeSecuritySystemsAuthentication
 
         $this->audit($userId, 'User created');
 
-        $twoFactorKey = sha1($secret);
+        $user = [
+            'id' => $userId,
+            'user' => $display,
+            'level' => $level
+        ];
 
-        sodium_memzero($secret);
-
-        return $twoFactorKey;
+        return $user;
     }
 
     /**
@@ -140,9 +142,8 @@ class SuperSafeSecuritySystemsAuthentication
 
         $user = [
             'id' => $user['user_id'],
-            'user' => $user['user_password'],
-            'level' => $user['user_password'],
-            '2fa' => sha1($secret)
+            'user' => $user['user_display'],
+            'level' => $user['user_level']
         ];
 
         $nonce = mb_substr($passwordData, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, '8bit');
