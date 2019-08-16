@@ -38,7 +38,7 @@ class SuperSafeSecuritySystemsAuthentication
      * @param string $display
      * @param string $password
      * @param int $level
-     * @return string
+     * @return array
      * @throws \Exception
      */
     public function create($email, $display, $password, $level = self::DEFAULT_LEVEL)
