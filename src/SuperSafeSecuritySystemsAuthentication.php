@@ -38,7 +38,7 @@ class SuperSafeSecuritySystemsAuthentication
      * @param string $display
      * @param string $password
      * @param int $level
-     * @return array
+     * @return string
      * @throws \Exception
      */
     public function create($email, $display, $password, $level = self::DEFAULT_LEVEL)
@@ -86,7 +86,7 @@ class SuperSafeSecuritySystemsAuthentication
 
         $userId = $this->db->insert_id;
 
-        $this->audit($userId, 'User created');
+        $this->audit($userId, '"User created"');
 
         $user = [
             'id' => $userId,
@@ -163,7 +163,7 @@ class SuperSafeSecuritySystemsAuthentication
         if ($decrypted !== $password) {
             $this->audit(
                 $user['id'],
-                'Failed login from IP ' . $_SERVER['REMOTE_ADDR']
+                '"Failed login from IP ' . $_SERVER['REMOTE_ADDR'] . '"'
             );
 
             throw new AuthenticationException();
@@ -171,7 +171,7 @@ class SuperSafeSecuritySystemsAuthentication
 
         $this->audit(
             $user['id'],
-            'Successful login from IP ' . $_SERVER['REMOTE_ADDR']
+            '"Successful login from IP ' . $_SERVER['REMOTE_ADDR'] . '""'
         );
 
         sodium_memzero($decrypted);
@@ -189,7 +189,7 @@ class SuperSafeSecuritySystemsAuthentication
         $this->db->query(
             "INSERT INTO `audit` (user_id, audit_event) 
                 VALUES 
-              ('{$userId}', '{$message}');"
+              ('{$userId}', {$message});"
         );
     }
 
